@@ -70,7 +70,7 @@ class DB:
         return capture.get()
 
     def _callback(
-        self, callback: Callable[..., None], origin: "DB" | None, *args: Any
+        self, callback: Callable[..., None], origin: DB | None, *args: Any
     ) -> None:
         if origin is not self:
             callback(*args)
@@ -79,7 +79,7 @@ class DB:
         return self._doc.transaction(self)
 
     @classmethod
-    def from_dict(cls, db_dict: dict[str, Any], doc: Doc | None = None) -> "DB":
+    def from_dict(cls, db_dict: dict[str, Any], doc: Doc | None = None) -> DB:
         """
         Creates a database from a dictionary.
 
@@ -100,7 +100,7 @@ class DB:
             return db
 
     @classmethod
-    def from_json(cls, data: str, doc: Doc | None = None) -> "DB":
+    def from_json(cls, data: str, doc: Doc | None = None) -> DB:
         """
         Creates a database from a JSON string.
 
@@ -201,9 +201,7 @@ class DB:
                     for key, val in keys.items():
                         if val["action"] == "delete":
                             removed.add(key)
-                        elif val["action"] == "add":
-                            added[key] = val["newValue"]
-                        elif val["action"] == "update":
+                        elif val["action"] == "add" or val["action"] == "update":
                             added[key] = val["newValue"]
                     if removed:
                         callbacks = self._catalogue_change_callbacks[uuid][
@@ -261,9 +259,7 @@ class DB:
                 for key, val in keys.items():
                     if val["action"] == "delete":
                         removed.add(key)
-                    elif val["action"] == "add":
-                        added[key] = val["newValue"]
-                    elif val["action"] == "update":
+                    elif val["action"] == "add" or val["action"] == "update":
                         added[key] = val["newValue"]
                 if removed:
                     callbacks = self._event_change_callbacks[uuid][f"remove_{name}"]
@@ -344,8 +340,8 @@ class DB:
     def create_event(
         self,
         *,
-        start: datetime | int | float | str,
-        stop: datetime | int | float | str,
+        start: datetime | float | str,
+        stop: datetime | float | str,
         author: str,
         uuid: UUID | str | bytes | bytearray | None = None,
         tags: list[str] | None = None,
@@ -444,9 +440,7 @@ class DB:
         except KeyError:
             raise RuntimeError(f"No event found with UUID: {uuid}")
 
-    def _handle_sync_message(
-        self, message: bytes, db: "DB", init: bool = False
-    ) -> None:
+    def _handle_sync_message(self, message: bytes, db: DB, init: bool = False) -> None:
         if init:
             _message = create_sync_message(self._doc)
             db._handle_sync_message(_message, self)
@@ -464,7 +458,7 @@ class DB:
                 ):  # pragma: nocover
                     raise
 
-    def sync(self, db: "DB") -> None:
+    def sync(self, db: DB) -> None:
         """
         Keeps the database in sync with another database. Mostly used for tests.
 
@@ -487,17 +481,13 @@ class DB:
             The database as a dictionary.
         """
         db_dict = {
-            "events": list(
-                sorted(
-                    [event.to_dict() for event in self.events],
-                    key=lambda event: event["uuid"],
-                )
+            "events": sorted(
+                [event.to_dict() for event in self.events],
+                key=lambda event: event["uuid"],
             ),
-            "catalogues": list(
-                sorted(
-                    [catalogue.to_dict(True) for catalogue in self.catalogues],
-                    key=lambda catalogue: catalogue["uuid"],
-                )
+            "catalogues": sorted(
+                [catalogue.to_dict(True) for catalogue in self.catalogues],
+                key=lambda catalogue: catalogue["uuid"],
             ),
         }
         events = db_dict["events"]

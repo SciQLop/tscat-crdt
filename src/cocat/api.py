@@ -1,9 +1,9 @@
 import atexit
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from contextlib import ExitStack
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 from urllib.parse import urlparse
 from uuid import UUID
 
@@ -207,8 +207,8 @@ def create_catalogue(
 
 def create_event(
     *,
-    start: datetime | int | float | str,
-    stop: datetime | int | float | str,
+    start: datetime | float | str,
+    stop: datetime | float | str,
     author: str,
     uuid: UUID | str | bytes | bytearray | None = None,
     tags: list[str] | None = None,

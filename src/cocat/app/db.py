@@ -1,6 +1,5 @@
-from collections.abc import AsyncGenerator, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
 from dataclasses import dataclass
-from typing import Awaitable
 
 from anyio import Lock, Path
 from fastapi import Depends
