@@ -34,7 +34,7 @@ class Catalogue(Mixin):
         if self._uuid not in self._db._catalogue_maps:
             raise RuntimeError("Catalogue has been deleted")
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         self._check_deleted()
         if not isinstance(other, Catalogue):
             return NotImplemented
@@ -135,7 +135,7 @@ class Catalogue(Mixin):
         self._check_deleted()
         dct = self._map.to_py()
         assert dct is not None
-        dct["tags"] = list(sorted(dct["tags"].keys()))
+        dct["tags"] = sorted(dct["tags"].keys())
         dct["events"] = [
             uuid if event_as_uuid else Event._from_uuid(uuid, self._db).to_dict()
             for uuid in sorted(dct["events"].keys())

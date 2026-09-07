@@ -20,11 +20,7 @@ event0 = db0.create_event(
     author="John",
     attributes={"foo": "bar"},
 )
-catalogue0 = db0.create_catalogue(
-    name="cat0",
-    author="Paul",
-    attributes={"baz": 3}
-)
+catalogue0 = db0.create_catalogue(name="cat0", author="Paul", attributes={"baz": 3})
 catalogue0.add_events(event0)
 event0.stop = "2026-01-30"
 ```
@@ -35,9 +31,11 @@ Up to now their data is local, but they could share the database using a web ser
 from anyio import run, sleep_forever
 from wire_websocket import AsyncWebSocketServer
 
+
 async def main():
     async with AsyncWebSocketServer(host="localhost", port=8000):
         await sleep_forever()
+
 
 run(main)
 ```
@@ -48,9 +46,11 @@ And here is how user A can connect to this server:
 from anyio import run, sleep_forever
 from wire_websocket import AsyncWebSocketClient
 
+
 async def main():
     async with AsyncWebSocketClient(doc=db0.doc, host="http://localhost", port=8000):
         await sleep_forever()
+
 
 run(main)
 ```
@@ -62,11 +62,13 @@ from anyio import run, sleep_forever
 from cocat import DB
 from wire_websocket import AsyncWebSocketClient
 
+
 async def main():
     db1 = DB()
     async with AsyncWebSocketClient(doc=db1.doc, host="http://localhost", port=8000):
         print(db1.catalogues)
         print(db1.events)
+
 
 run(main)
 ```

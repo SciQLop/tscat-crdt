@@ -31,7 +31,7 @@ class Event(Mixin):
         if self._uuid not in self._db._event_maps:
             raise RuntimeError("Event has been deleted")
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         self._check_deleted()
         if not isinstance(other, Event):
             return NotImplemented
@@ -131,8 +131,8 @@ class Event(Mixin):
         self._check_deleted()
         dct = self._map.to_py()
         assert dct is not None
-        dct["tags"] = list(sorted(dct["tags"].keys()))
-        dct["products"] = list(sorted(dct["products"].keys()))
+        dct["tags"] = sorted(dct["tags"].keys())
+        dct["products"] = sorted(dct["products"].keys())
         dct["attributes"] = dict(sorted(dct["attributes"].items()))
         return {key: dct[key] for key in EventModel.model_fields.keys()}
 
